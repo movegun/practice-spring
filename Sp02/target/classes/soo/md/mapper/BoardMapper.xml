@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="soo.md.mapper.BoardMapper">
+	<select id="list" resultType="Board">
+		select * from BOARD order by SEQ desc
+	</select>
+	<insert id="insert" parameterType="Board">
+		insert into BOARD values(BOARD_SEQ.nextval,#{writer},#{email},#{subject},#{content},SYSDATE)
+	</insert>
+	<select id="find" parameterType="long" resultType="Board">
+		select * from Board where SEQ=#{seq} 
+	</select>
+	<delete id="delete" parameterType="long">
+		delete from BOARD where SEQ=#{seq}
+	</delete>
+	<update id="update" parameterType="Board" >
+		update BOARD set WRITER=#{writer},EMAIL=#{email},SUBJECT=#{subject},CONTENT=#{content} where SEQ=#{seq}
+	</update>
+	
+	<!--페이징할 총 게시글 갯수-->
+	<select id="countBoard" resultType="int">
+		select count(*) from BOARD
+	</select>
+	
+	<!-- 페이징 처리 후 게시글 조회 get값에 따라 다른내용들을 쏴줘야하니까 -->
+	<select id="selectBoard" resultType="Board" >
+	SELECT * 
+		FROM (
+			SELECT ROWNUM RN, A.* 
+				FROM (
+						SELECT * 
+						FROM BOARD 
+						ORDER BY SEQ DESC 
+						) A
+				)
+	WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+</mapper>
+
+   
