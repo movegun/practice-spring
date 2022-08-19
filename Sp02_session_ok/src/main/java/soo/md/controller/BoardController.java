@@ -89,7 +89,7 @@ public class BoardController {
 		if (orderBy == null) {
 			orderBy = "desc";
 		}		
-		
+		log.info("안농안농");
 		log.info("확인용 orderBy : " + orderBy);
 		log.info("확인용1 cp : " + cp);
 		log.info("확인용2 ps : " + ps);
