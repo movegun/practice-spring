@@ -56,6 +56,16 @@ public class BoardServiceImpl implements BoardService {
 		return boardMapper.selectBoardAsc(vo);
 	}		
 	
+	@Override
+	public int countBoardKeywordS(String keyword) {		
+		return boardMapper.countBoardKeyword(keyword);
+	}
+	
+	@Override
+	public List<Board> selectBoardKeywordS(PagingVO vo){
+		return boardMapper.selectBoardKeyword(vo);
+	}
+	
 	
 
 }

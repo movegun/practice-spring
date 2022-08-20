@@ -13,7 +13,7 @@ public class PagingVO {
 	// SQL쿼리에 필요한 start, end rownum
 	private int nowPage, startPage, endPage, total, cntPerPage, lastPage, start, end;
 	
-	private int rowNum;
+	private String keyword; // 검색 키워드 받을때 필요
 	
 	//멤버에 정해준건 맨처음 정하지 않고 list에 들어갔을때를 위해서
 	private int cntPage = 5;
@@ -22,6 +22,16 @@ public class PagingVO {
 		setNowPage(nowPage);
 		setCntPerPage(cntPerPage);
 		setTotal(total);
+		calcLastPage(getTotal(), getCntPerPage());
+		calcStartEndPage(getNowPage(), cntPage);
+		calcStartEnd(getNowPage(), getCntPerPage());		
+	}
+	
+	public PagingVO(int totalK,int nowPage, int cntPerPage , String keyword ) {
+		setNowPage(nowPage);
+		setCntPerPage(cntPerPage);
+		setTotal(totalK);
+		setKeyword(keyword);
 		calcLastPage(getTotal(), getCntPerPage());
 		calcStartEndPage(getNowPage(), cntPage);
 		calcStartEnd(getNowPage(), getCntPerPage());		

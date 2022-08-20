@@ -28,90 +28,92 @@ import soo.md.util.PagingVO;
 public class BoardController {
 
 	private BoardService boardService;
-	
+
 	@GetMapping("/list.do")
-	public ModelAndView list(PagingVO vo, String cp, String ps, String orderBy, HttpSession session, HttpServletRequest request) {
-		
+	public ModelAndView list(PagingVO vo, String cp, String ps, String orderBy, HttpSession session,
+			HttpServletRequest request) {
+
 		String cpFromJsp = request.getParameter("cp");
 		String psFromJsp = request.getParameter("ps");
 		String orderByFromJsp = request.getParameter("orderBy");
-		
-		log.info("cpFromJsp : "+cpFromJsp);
-		log.info("psFromJsp : "+psFromJsp);
-		log.info("orderByFromJsp : "+orderByFromJsp);
-		
+		String keywordParam = request.getParameter("keyword");
+
+		log.info("cpFromJsp : " + cpFromJsp);
+		log.info("psFromJsp : " + psFromJsp);
+		log.info("orderByFromJsp : " + orderByFromJsp);
+		log.info("keywordParam : " + keywordParam);
+
 		///////////////////////////// 다른페이지 갔다 왔을 때 모두 다 null로 들어옴
-		
-		if ( cpFromJsp == null ) {
+		cp = "1"; // 입장페이지
+		if (cpFromJsp == null) {
 			Object cpObject = session.getAttribute("cp");
-			if(cpObject != null) {
-				cp = (String)cpObject;
-			}			
-		}else {
+			if (cpObject != null) {
+				cp = (String) cpObject;
+			}
+		} else {
 			cp = cpFromJsp;
 		}
 		session.setAttribute("cp", cp);
 		//////////////////////////////////////////
-		
+		ps = "10"; // 입장리스트사이즈
 		if (psFromJsp == null) {
-			Object psObject =session.getAttribute("ps");
-			if(psObject != null) {
-				ps = (String)psObject;				
+			Object psObject = session.getAttribute("ps");
+			if (psObject != null) {
+				ps = (String) psObject;
 			}
-		}else {
-			ps = psFromJsp;			
+		} else {
+			ps = psFromJsp;
 		}
 		session.setAttribute("ps", ps);
-		
-		if(orderByFromJsp == null) {
+
+		if (orderByFromJsp == null) {
 			Object orderByObject = session.getAttribute("orderBy");
-			if(orderByObject != null) {
-				orderBy = (String)orderByObject;				
-			}			
-		}else {
+			if (orderByObject != null) {
+				orderBy = (String) orderByObject;
+			}
+		} else {
 			orderBy = orderByFromJsp;
 		}
-		
+
 		session.setAttribute("orderBy", orderBy);
-		
 
 		int total = boardService.countBoardS();
+
 		// 둘다 비어있다 = 처음 들어갔을 당시 디폴트 현재페이지 페이지당 갯수를 각각 1 5 로 하겠다
-		if (cp == null && ps == null) {
-			cp = "1";
-			ps = "5";
-		} else if (cp == null) {
-			cp = "1";
-		} else if (ps == null) {
-			ps = "5";
-		}
-		
+
 		if (orderBy == null) {
 			orderBy = "desc";
-		}		
-		log.info("안농안농");
-		log.info("확인용 orderBy : " + orderBy);
-		log.info("확인용1 cp : " + cp);
-		log.info("확인용2 ps : " + ps);
+		}
 
 		vo = new PagingVO(total, Integer.parseInt(cp), Integer.parseInt(ps));
-
-		// default = cp:1 , ps:5 , order:desc
 		List<Board> pagingList = null;
 		if (orderBy.equals("desc")) {
 			pagingList = boardService.selectBoardS(vo);
 		} else {
 			pagingList = boardService.selectBoardAscS(vo);
 		}
-		
+
 		int lastPage = vo.getLastPage();
-		log.info("lastPage"+lastPage);
+		log.info("lastPage" + lastPage);
 		session.setAttribute("lastPage", lastPage);
 
-		ModelAndView mv = new ModelAndView("board/list", "boardNums", vo);
-		mv.addObject("pagingList", pagingList);
-		mv.addObject("orderBy", orderBy);
-		return mv;
+		if (keywordParam != null) {
+			String keyword = keywordParam;
+			int totalK = boardService.countBoardKeywordS(keyword);
+			
+			vo = new PagingVO(totalK, Integer.parseInt(cp), Integer.parseInt(psFromJsp), keyword);
+			pagingList = boardService.selectBoardKeywordS(vo);
+
+			ModelAndView mv = new ModelAndView("board/list", "boardNums", vo);
+			mv.addObject("keyword", keyword);
+			mv.addObject("pagingList", pagingList);
+			return mv;
+		}else {
+			ModelAndView mv = new ModelAndView("board/list", "boardNums", vo);
+			mv.addObject("pagingList", pagingList);
+			mv.addObject("orderBy", orderBy);
+			return mv;
+		}
 	}
 
 //	@GetMapping("/list.do")
@@ -171,24 +173,23 @@ public class BoardController {
 	}
 
 	@PostMapping("/write.do")
-	public String write(Board board , HttpSession session) {
-		log.info("orderByorderByorderBy : "+ session.getAttribute("orderBy"));
+	public String write(Board board, HttpSession session) {
+		log.info("orderByorderByorderBy : " + session.getAttribute("orderBy"));
 		boardService.insertS(board);
 		Object orderByObject = session.getAttribute("orderBy");
-		String orderBy = (String)orderByObject;
-		
-		log.info("StringorderBy :"+orderBy);
-		
+		String orderBy = (String) orderByObject;
+
+		log.info("StringorderBy :" + orderBy);
+
 		Object lastPageObject = session.getAttribute("lastPage");
-		String lastPage = lastPageObject.toString();		
-		log.info("StringlastPageStringlastPage : "+lastPage);
-		
-		
-		if (orderBy=="desc") {
-			return ("redirect:list.do/?cp=1");			
-		}else {
-			return ("redirect:list.do/?cp="+lastPage);
-		}		
+		String lastPage = lastPageObject.toString();
+		log.info("StringlastPageStringlastPage : " + lastPage);
+
+		if (orderBy == "desc") {
+			return ("redirect:list.do/?cp=1");
+		} else {
+			return ("redirect:list.do/?cp=" + lastPage);
+		}
 	}
 
 	@GetMapping("/content.do")

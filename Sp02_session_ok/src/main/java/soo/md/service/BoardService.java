@@ -13,7 +13,9 @@ public interface BoardService {
 	Board findS(long seq);
 	void updateS(Board board);
 	int countBoardS();
+	int countBoardKeywordS(String keyword);
 	List<Board> selectBoardS(PagingVO vo);
-	List<Board> selectBoardAscS(PagingVO vo);	
+	List<Board> selectBoardAscS(PagingVO vo);
+	List<Board> selectBoardKeywordS(PagingVO vo);
 
 }

@@ -12,6 +12,8 @@ public interface BoardMapper {
 	Board find(long seq);
 	void update(Board board);
 	int countBoard();
+	int countBoardKeyword(String keyword);
 	List<Board> selectBoard(PagingVO vo);
-	List<Board> selectBoardAsc(PagingVO vo);	
+	List<Board> selectBoardAsc(PagingVO vo);
+	List<Board> selectBoardKeyword(PagingVO vo);	
 }
